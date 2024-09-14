@@ -150,7 +150,7 @@ dmypy.json
 
 # pytype static type analyzer
 .pytype/
-
+scenes/*/*.ipynb
 # Cython debug symbols
 cython_debug/
 
