@@ -78,10 +78,9 @@ class LineStar:
         # Public method to access the private array if needed
         return self._linear_space
     
-@dataclass
 class LinestarScene(Scene):
-    curr_palette: List[str | ManimColor] = field(default_factory=list, repr=False)
-    reverse_palette: bool = field(default=False)
+    curr_palette: List[str | ManimColor] = []
+    reverse_palette: bool = False
     background_color: ManimColor | str = field(default_factory=WHITE)
     create_lag_ratio: float = 0.01
     
