@@ -13,6 +13,11 @@ ONEDARK_VIVID_PALETTE = [
 ]
 
 
+
+# sequential palettes
+golder_sunset = ["#fdb813", "#ffc300", "#ff5733", "#c70039", "#900c3f"]
+sunset_skyline = ["#ffdfb3","#faad45","#f46046","#bc0967","#411259",]
+
 # some colors
 EGGSHELL_WHITE = manim.ManimColor("#F0EAD6")
 

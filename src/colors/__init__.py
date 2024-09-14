@@ -1,1 +1,1 @@
-from palettes import *
+from .palettes import *
