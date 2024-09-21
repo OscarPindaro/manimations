@@ -92,7 +92,7 @@ class LinestarScene(Scene):
         self.linestar = LineStar(6, 25, colors=self.curr_palette)
     
     def construct(self):
-        self.camera.background_color = WHITE
+        self.camera.background_color = self.background_color
         self.wait(0.25)
         self.play(LaggedStart(*self.linestar.create_lines(), lag_ratio=self.create_lag_ratio))
         # self.play(FadeIn(Line((0,0,0), (3,3,0))))
