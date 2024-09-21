@@ -127,9 +127,18 @@ def render_linestar(
     if not output:
         # Normalize the palette and background color for the filename
         normalized_palette = palette.lower().replace(" ", "_")
-        normalized_background = (
-            background_color.lstrip("#").lower().replace(" ", "_")
-        )  # If hex, strip the '#'
+        if isinstance(background_color, str):
+            normalized_background = (
+                background_color.lstrip("#").lower().replace(" ", "_")
+            )  # If hex, strip the '#'
+        elif isinstance(background_color, ManimColor):
+            normalized_background = (
+                background_color.to_hex().lstrip("#").lower().replace(" ", "_")
+            )
+        else:
+            raise ValueError(
+                f"Not handling the background_color type: {type(background_color)}"
+            )
         scene_class_name = LinestarScene.__name__
         output = f"{scene_class_name}_{normalized_palette}_{normalized_background}.mp4"
 

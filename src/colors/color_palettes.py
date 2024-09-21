@@ -35,7 +35,7 @@ ONEDARK = [
 
 
 # sequential palettes
-GOLDER_SUNSET = ["#fdb813", "#ffc300", "#ff5733", "#c70039", "#900c3f"]
+GOLDEN_SUNSET = ["#fdb813", "#ffc300", "#ff5733", "#c70039", "#900c3f"]
 SUNSET_SKYLINE = [
     "#ffdfb3",
     "#faad45",
@@ -107,7 +107,7 @@ PALETTES = NormalizedDict(
     {
         "ONEDARK_CLASSIC": ONEDARK_CLASSIC,
         "ONEDARK": ONEDARK,
-        "GOLDER_SUNSET": GOLDER_SUNSET,
+        "GOLDEN_SUNSET": GOLDEN_SUNSET,
         "SUNSET_SKYLINE": SUNSET_SKYLINE,
         "PASTEL_RAINBOW": PASTEL_RAINBOW,
         "HIGH_SATURATION_RAINBOW": HIGH_SATURATION_RAINBOW,

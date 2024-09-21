@@ -15,8 +15,10 @@ class ColorType(click.ParamType):
         if re.match(r"^#([A-Fa-f0-9]{6})$", value):
             return value
         # Check if the value exists in all_colors or all_manim_colors
-        elif value in COLORS or value in MANIM_COLORS:
-            return value
+        elif value in COLORS:
+            return COLORS[value]
+        elif value in MANIM_COLORS:
+            return MANIM_COLORS[value]
         else:
             self.fail(
                 f"'{value}' is not a valid hex color or known color. Expected a hex format like '#FFFFFF' or a known color name from COLORS or MANIM_COLORS."
@@ -138,4 +140,5 @@ def check_extend_blog_directory(directory: str | None, folder_name: str):
 
 # Entry point for the CLI group
 if __name__ == "__main__":
+    print(COLORS)
     cli()
