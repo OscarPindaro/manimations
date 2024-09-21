@@ -1,1 +1,1 @@
-from .palettes import *
+from .color_palettes import *
