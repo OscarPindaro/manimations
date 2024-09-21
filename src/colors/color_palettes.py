@@ -18,9 +18,6 @@ ONEDARK = [
 GOLDER_SUNSET = ["#fdb813", "#ffc300", "#ff5733", "#c70039", "#900c3f"]
 SUNSET_SKYLINE = ["#ffdfb3","#faad45","#f46046","#bc0967","#411259",]
 
-# some colors
-EGGSHELL_WHITE = manim.ManimColor("#F0EAD6")
-
 
 """rainbow palettes
 
@@ -37,7 +34,7 @@ ONEDARK_VIVID_RAINBOW = ["#f44747", "#d19a66",  "#e5c07b","#89ca78", "#61afef", 
 
 
 # Using the new PaletteDict class with the existing palettes
-palettes = NormalizedDict({
+PALETTES = NormalizedDict({
     "ONEDARK_CLASSIC": ONEDARK_CLASSIC,
     "ONEDARK": ONEDARK,
     "GOLDER_SUNSET": GOLDER_SUNSET,
@@ -48,5 +45,4 @@ palettes = NormalizedDict({
     "NEON_RAINBOW": NEON_RAINBOW,
     "ONEDARK_CLASS_RAINBOW": ONEDARK_CLASS_RAINBOW,
     "ONEDARK_VIVID_RAINBOW": ONEDARK_VIVID_RAINBOW,
-    "EGGSHELL_WHITE": EGGSHELL_WHITE
 })
