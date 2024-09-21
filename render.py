@@ -1,8 +1,9 @@
 import click
 from manim import *
-from scenes.linestar.linestar import LineStar, LinestarScene
+from scenes.linestar.linestar import LineStar, LinestarScene, render_linestar
 from src.colors import PALETTES, COLORS, MANIM_COLORS
 import re
+import pathlib
 
 
 # Create a custom Click type for hex color or named color validation
@@ -62,8 +63,13 @@ def cli():
     type=ColorType(),
     help="Background color (hex or named color).",
 )
-@click.option("--video-dir", "-v", type=str, help="Directory where the video is saved")
-def render_linestar(
+@click.option(
+    "--video-dir",
+    "-v",
+    type=click.Path(dir_okay=True, file_okay=False),
+    help="Directory where the video is saved",
+)
+def linestar(
     width: int,
     height: int,
     frame_rate: float,
@@ -72,34 +78,62 @@ def render_linestar(
     background_color: str,
     video_dir: str,
 ):
+    render_linestar(
+        width=width,
+        height=height,
+        frame_rate=frame_rate,
+        output=output,
+        palette=palette,
+        background_color=background_color,
+        video_dir=video_dir,
+    )
 
-    # Generate the default output file name if none is provided
-    if not output:
-        # Normalize the palette and background color for the filename
-        normalized_palette = palette.lower().replace(" ", "_")
-        normalized_background = (
-            background_color.lstrip("#").lower().replace(" ", "_")
-        )  # If hex, strip the '#'
-        scene_class_name = LinestarScene.__name__
-        output = f"{scene_class_name}_{normalized_palette}_{normalized_background}.mp4"
 
-    # Proceed with rendering the scene
-    config = {
-        "preview": False,
-        "pixel_width": width,
-        "pixel_height": height,
-        "output_file": output,
-        "frame_rate": frame_rate,
-    }
+# Add a 'render-multiple' command to the CLI
+@cli.command("render-multiple")
+@click.option("--width", "-w", default=720, type=int, help="Width of the output video.")
+@click.option(
+    "--height", "-h", default=720, type=int, help="Height of the output video."
+)
+@click.option(
+    "--frame-rate", "-f", default=60, type=int, help="Frame rate of the output video."
+)
+@click.option(
+    "--video-dir",
+    "-v",
+    type=click.Path(file_okay=False, dir_okay=True),
+    help="Directory where the video is saved.",
+)
+@click.option(
+    "--palette-background",
+    "-p",
+    "pb_pairs",
+    type=click.Tuple([str, ColorType()]),
+    multiple=True,
+    help="Tuples of the type (palette background)",
+)
+def render_multiple(
+    width: int, height: int, frame_rate: float, video_dir: str, pb_pairs
+):
+    video_dir = check_extend_blog_directory(video_dir, "linestar")
+    for palette, background in pb_pairs:
+        render_linestar(
+            width=width,
+            height=height,
+            frame_rate=frame_rate,
+            palette=palette,
+            output=None,
+            background_color=background,
+            video_dir=video_dir,
+        )
 
-    if video_dir is not None:
-        config["video_dir"] = video_dir
-    with tempconfig(config):
-        print(config.keys())  # Debug print
-        scene = LinestarScene()
-        scene.curr_palette = PALETTES[palette]  # Use the validated palette
-        scene.background_color = background_color  # Set the validated background color
-        scene.render()
+
+def check_extend_blog_directory(directory: str | None, folder_name: str):
+    if directory is not None:
+        support_video_dir = pathlib.Path(directory)
+        if str(support_video_dir) == "blog":
+            return str(support_video_dir / folder_name)
+    return directory
 
 
 # Entry point for the CLI group

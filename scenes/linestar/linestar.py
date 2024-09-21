@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 import numpy as np
 from typing import List, Tuple
 
-from src.colors import ONEDARK_CLASS_RAINBOW
+from src.colors import ONEDARK_CLASS_RAINBOW, PALETTES, COLORS
 
 
 @dataclass
@@ -111,3 +111,42 @@ class LinestarScene(Scene):
                 *self.linestar.uncreate_lines(), lag_ratio=self.create_lag_ratio
             )
         )
+
+
+def render_linestar(
+    width: int,
+    height: int,
+    frame_rate: float,
+    output: str,
+    palette: str,
+    background_color: str,
+    video_dir: str,
+):
+
+    # Generate the default output file name if none is provided
+    if not output:
+        # Normalize the palette and background color for the filename
+        normalized_palette = palette.lower().replace(" ", "_")
+        normalized_background = (
+            background_color.lstrip("#").lower().replace(" ", "_")
+        )  # If hex, strip the '#'
+        scene_class_name = LinestarScene.__name__
+        output = f"{scene_class_name}_{normalized_palette}_{normalized_background}.mp4"
+
+    # Proceed with rendering the scene
+    config = {
+        "preview": False,
+        "pixel_width": width,
+        "pixel_height": height,
+        "output_file": output,
+        "frame_rate": frame_rate,
+    }
+
+    if video_dir is not None:
+        config["video_dir"] = video_dir
+    with tempconfig(config):
+        print(config.keys())  # Debug print
+        scene = LinestarScene()
+        scene.curr_palette = PALETTES[palette]  # Use the validated palette
+        scene.background_color = background_color  # Set the validated background color
+        scene.render()
