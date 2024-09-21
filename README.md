@@ -9,7 +9,7 @@ I wrote a configurable python script that allows to configure the palette and th
 
 ### Light background
 ```bash
-python render.py render-multiple -w 480 -h 480 -v blog/linestar/light \
+python render.py render-multiple -w 720 -h 720 --format webm -v blog/linestar/light \
 -p "ONEDARK_CLASSIC" "EGGSHELL_WHITE"  \
 -p "ONEDARK" "EGGSHELL_WHITE" \
 -p "GOLDEN_SUNSET" "EGGSHELL_WHITE" \
@@ -20,4 +20,19 @@ python render.py render-multiple -w 480 -h 480 -v blog/linestar/light \
 -p "NEON_RAINBOW" "EGGSHELL_WHITE" \
 -p "ONEDARK_CLASS_RAINBOW" "EGGSHELL_WHITE" \
 -p "ONEDARK_VIVID_RAINBOW" "EGGSHELL_WHITE" 
+```
+
+### Dark background
+```bash
+python render.py render-multiple -w 720 -h 720 --format gif -v blog/linestar/dark \
+-p "ONEDARK_CLASSIC" "#282c33"  \
+-p "ONEDARK" "#282c33" \
+-p "GOLDEN_SUNSET" "#282c33" \
+-p "SUNSET_SKYLINE" "#282c33" \
+-p "PASTEL_RAINBOW" "#282c33" \
+-p "HIGH_SATURATION_RAINBOW" "#282c33" \
+-p "MUTED_RAINBOW" "#282c33" \
+-p "NEON_RAINBOW" "#282c33" \
+-p "ONEDARK_CLASS_RAINBOW" "#282c33" \
+-p "ONEDARK_VIVID_RAINBOW" "#282c33" 
 ```

@@ -142,10 +142,7 @@ def render_linestar(
                 f"Not handling the background_color type: {type(background_color)}"
             )
         scene_class_name = LinestarScene.__name__
-        output = (
-            f"{scene_class_name}_{normalized_palette}_{normalized_background}.{format}"
-        )
-
+        output = f"{scene_class_name}_{normalized_palette}_{normalized_background}"
     # Proceed with rendering the scene
     external_config = {
         "preview": False,
@@ -159,7 +156,7 @@ def render_linestar(
     if video_dir is not None:
         external_config["video_dir"] = video_dir
     with tempconfig(external_config):
-        print(config.keys())  # Debug print
+        # print(config.keys())  # Debug print
 
         scene = LinestarScene()
         scene.curr_palette = PALETTES[palette]  # Use the validated palette
