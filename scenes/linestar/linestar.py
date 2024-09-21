@@ -1,7 +1,7 @@
 from manim import *
 from dataclasses import dataclass, field
 import numpy as np
-from typing import List, Tuple
+from typing import List, Tuple, Literal
 
 from src.colors import ONEDARK_CLASS_RAINBOW, PALETTES, COLORS
 
@@ -121,8 +121,10 @@ def render_linestar(
     palette: str,
     background_color: str,
     video_dir: str,
+    format: Literal[None, "png", "gif", "mp4", "mov", "webm"],
 ):
 
+    format = "mp4" if format is None else format
     # Generate the default output file name if none is provided
     if not output:
         # Normalize the palette and background color for the filename
@@ -140,21 +142,25 @@ def render_linestar(
                 f"Not handling the background_color type: {type(background_color)}"
             )
         scene_class_name = LinestarScene.__name__
-        output = f"{scene_class_name}_{normalized_palette}_{normalized_background}.mp4"
+        output = (
+            f"{scene_class_name}_{normalized_palette}_{normalized_background}.{format}"
+        )
 
     # Proceed with rendering the scene
-    config = {
+    external_config = {
         "preview": False,
         "pixel_width": width,
         "pixel_height": height,
         "output_file": output,
         "frame_rate": frame_rate,
+        "format": format,
     }
 
     if video_dir is not None:
-        config["video_dir"] = video_dir
-    with tempconfig(config):
+        external_config["video_dir"] = video_dir
+    with tempconfig(external_config):
         print(config.keys())  # Debug print
+
         scene = LinestarScene()
         scene.curr_palette = PALETTES[palette]  # Use the validated palette
         scene.background_color = background_color  # Set the validated background color

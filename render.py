@@ -4,6 +4,7 @@ from scenes.linestar.linestar import LineStar, LinestarScene, render_linestar
 from src.colors import PALETTES, COLORS, MANIM_COLORS
 import re
 import pathlib
+from typing import Literal, Tuple
 
 
 # Create a custom Click type for hex color or named color validation
@@ -71,6 +72,12 @@ def cli():
     type=click.Path(dir_okay=True, file_okay=False),
     help="Directory where the video is saved",
 )
+@click.option(
+    "--format",
+    default=None,
+    type=click.Choice([None, "png", "gif", "mp4", "mov", "webm"]),
+    help="Export format for the animation",
+)
 def linestar(
     width: int,
     height: int,
@@ -79,6 +86,7 @@ def linestar(
     palette: str,
     background_color: str,
     video_dir: str,
+    format: Literal[None, "png", "gif", "mp4", "mov", "webm"],
 ):
     render_linestar(
         width=width,
@@ -88,6 +96,7 @@ def linestar(
         palette=palette,
         background_color=background_color,
         video_dir=video_dir,
+        format=format,
     )
 
 
@@ -114,8 +123,19 @@ def linestar(
     multiple=True,
     help="Tuples of the type (palette background)",
 )
+@click.option(
+    "--format",
+    default=None,
+    type=click.Choice([None, "png", "gif", "mp4", "mov", "webm"]),
+    help="Export format for the animation",
+)
 def render_multiple(
-    width: int, height: int, frame_rate: float, video_dir: str, pb_pairs
+    width: int,
+    height: int,
+    frame_rate: float,
+    video_dir: str,
+    format: Literal[None, "png", "gif", "mp4", "mov", "webm"],
+    pb_pairs: List[Tuple[str, str]],
 ):
     video_dir = check_extend_blog_directory(video_dir, "linestar")
     for palette, background in pb_pairs:
@@ -127,6 +147,7 @@ def render_multiple(
             output=None,
             background_color=background,
             video_dir=video_dir,
+            format=format,
         )
 
 
