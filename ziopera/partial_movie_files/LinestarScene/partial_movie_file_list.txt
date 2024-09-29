@@ -1,5 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:/home/oscar/Progetti/manimations/ziopera/partial_movie_files/LinestarScene/227489406_4244528018_631829896.mp4'
-file 'file:/home/oscar/Progetti/manimations/ziopera/partial_movie_files/LinestarScene/227489406_4104054085_4227516557.mp4'
-file 'file:/home/oscar/Progetti/manimations/ziopera/partial_movie_files/LinestarScene/3571388329_79640510_3997027042.mp4'
-file 'file:/home/oscar/Progetti/manimations/ziopera/partial_movie_files/LinestarScene/3571388329_2164938462_627093125.mp4'
