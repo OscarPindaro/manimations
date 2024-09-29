@@ -15,11 +15,18 @@ class OneDarkClassicPalette:
     PURPLE: str = "#c678dd"
     ORANGE: str = "#d19a66"
     BRICK_RED: str = "#BE5046"
+    GRAY_D: str = "#282c33"
+    GRAY_E: str = "#21252b"
 
     # Aliases for grays
+    DARKEST_GRAY: str = GRAY_E
+    DARKER_GRAY: str = GRAY_D
     DARK_GRAY: str = GRAY_C
     MEDIUM_GRAY: str = GRAY_B
     LIGHT_GRAY: str = GRAY_A
+
+    DARK_BACKGROUND: str = DARKEST_GRAY
+    DARK_BACKGROUND_2: str = DARKER_GRAY
 
 
 class OneDarkVividPalette:
@@ -57,6 +64,9 @@ class GoldenSunsetPalette:
     DARK_RED: str = RED_B
 
     ORDERED_PALETTE: List[str] = [YELLOW_B, YELLOW_A, ORANGE, RED_A, RED_B]
+
+    DARK_BACKGROUND: str = "#21252b"
+    LIGHT_BACKGROUND: str = "#ffdfb3"
 
 
 class SunsetSkylinePalette:
