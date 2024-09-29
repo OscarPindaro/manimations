@@ -2,6 +2,8 @@ import manim
 from ..datatypes import NormalizedDict
 
 # palettes
+
+
 ONEDARK_CLASSIC = [
     "#e5c07b",
     "#e06c75",
@@ -103,7 +105,7 @@ ONEDARK_VIVID_RAINBOW = [
 
 
 # Using the new PaletteDict class with the existing palettes
-PALETTES = NormalizedDict(
+COLOR_LISTS = NormalizedDict(
     {
         "ONEDARK_CLASSIC": ONEDARK_CLASSIC,
         "ONEDARK": ONEDARK,

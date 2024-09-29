@@ -1,7 +1,7 @@
 import click
 from manim import *
 from scenes.linestar.linestar import LineStar, LinestarScene, render_linestar
-from src.colors import PALETTES, COLORS, MANIM_COLORS
+from src.colors import COLOR_LISTS, COLORS, MANIM_COLORS
 import re
 import pathlib
 from typing import Literal, Tuple
@@ -28,11 +28,11 @@ class ColorType(click.ParamType):
 
 # Create a custom palette validator callback
 def validate_palette(ctx, param, value):
-    if value in PALETTES:
+    if value in COLOR_LISTS:
         return value
     else:
         raise click.BadParameter(
-            f"'{value}' is not a valid palette. Choose from: {list(PALETTES.keys())}"
+            f"'{value}' is not a valid palette. Choose from: {list(COLOR_LISTS.keys())}"
         )
 
 

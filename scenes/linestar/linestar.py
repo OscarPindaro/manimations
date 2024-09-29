@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 import numpy as np
 from typing import List, Tuple, Literal
 
-from src.colors import ONEDARK_CLASS_RAINBOW, PALETTES, COLORS
+from src.colors import ONEDARK_CLASS_RAINBOW, COLOR_LISTS, COLORS
 
 
 @dataclass
@@ -159,6 +159,6 @@ def render_linestar(
         # print(config.keys())  # Debug print
 
         scene = LinestarScene()
-        scene.curr_palette = PALETTES[palette]  # Use the validated palette
+        scene.curr_palette = COLOR_LISTS[palette]  # Use the validated palette
         scene.background_color = background_color  # Set the validated background color
         scene.render()
