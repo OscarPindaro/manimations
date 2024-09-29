@@ -1,7 +1,7 @@
 import click
 from manim import *
 from scenes.linestar.linestar import LineStar, LinestarScene, render_linestar
-from src.colors import COLOR_LISTS, COLORS, MANIM_COLORS
+from manimations.colors import COLOR_LISTS, COLORS, MANIM_COLORS
 import re
 import pathlib
 from typing import Literal, Tuple

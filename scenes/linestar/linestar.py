@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 import numpy as np
 from typing import List, Tuple, Literal
 
-from src.colors import ONEDARK_CLASS_RAINBOW, COLOR_LISTS, COLORS
+from manimations.colors import ONEDARK_CLASS_RAINBOW, COLOR_LISTS, COLORS
 
 
 @dataclass
