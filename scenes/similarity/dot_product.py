@@ -1,4 +1,3 @@
-from PIL.Image import Palette
 from manim import *
 from manim import Vector, DecimalNumber
 from manim.typing import Vector2D, Vector3D

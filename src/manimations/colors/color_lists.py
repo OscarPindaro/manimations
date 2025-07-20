@@ -47,12 +47,6 @@ SUNSET_SKYLINE = [
 ]
 
 
-"""rainbow palettes
-
-The idea of this rainbow palettes is that they can be used to map real values to a rainbow spectrum with:
-```python
-gradient = color_gradient(colors, 100)
-"""
 PASTEL_RAINBOW = [
     "#FFADAD",
     "#FFD6A5",

@@ -123,7 +123,6 @@ def render_linestar(
     video_dir: str,
     format: Literal[None, "png", "gif", "mp4", "mov", "webm"],
 ):
-
     format = "mp4" if format is None else format
     # Generate the default output file name if none is provided
     if not output:

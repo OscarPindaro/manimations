@@ -2,7 +2,7 @@
 import sys
 from pathlib import Path
 import os
-
+from typing import Literal
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
@@ -20,7 +20,6 @@ from manimations.polynomials import Polynomial
 
 
 class PolynomialTransformation(Scene):
-
     def setup(self):
         self.start_poly = Polynomial(
             (
@@ -64,7 +63,6 @@ class PolynomialTransformation(Scene):
         self.number_plane.add_coordinates()
 
     def construct(self):
-
         starting_function = self.number_plane.plot(
             lambda x: self.start_poly(x),
             x_range=self.x_start_poly,
@@ -95,9 +93,7 @@ class PolynomialTransformation(Scene):
 
 
 class PolynomialFitting(Scene):
-
     def setup(self):
-
         # true distribution
         self.true_distribution = Polynomial(
             (
@@ -140,7 +136,6 @@ class PolynomialFitting(Scene):
         self.number_plane.add_coordinates()
 
     def construct(self):
-
         polys, errors = self.gradient_ascent_fit()
 
         # first let's add the true function with the datapoints
@@ -207,7 +202,6 @@ class PolynomialFitting(Scene):
 
 
 class StraightLinePoly(Scene):
-
     def setup(self):
         self.start_poly = Polynomial((-1, 2))
         self.x_start_poly = [-4, 4]
@@ -235,7 +229,6 @@ class StraightLinePoly(Scene):
         self.number_plane.add_coordinates()
 
     def construct(self):
-
         # self.camera.background_color = OneDarkClassicPalette.DARK_GRAY
         self.camera.background_color = OneDarkClassicPalette.DARK_BACKGROUND
 
@@ -278,7 +271,6 @@ class StraightLinePoly(Scene):
 
 
 class ParabolePoly(Scene):
-
     def setup(self):
         self.start_poly = Polynomial((-1, 2, 3))
         self.x_start_poly = [-4, 4]
@@ -306,7 +298,6 @@ class ParabolePoly(Scene):
         self.number_plane.add_coordinates()
 
     def construct(self):
-
         # self.camera.background_color = OneDarkClassicPalette.DARK_GRAY
         self.camera.background_color = OneDarkClassicPalette.DARK_BACKGROUND
 
@@ -348,11 +339,7 @@ class ParabolePoly(Scene):
         self.play(Uncreate(all_objects), run_time=2)
 
 
-from typing import Literal
-
-
 class RandomCubics(Scene):
-
     def setup(self):
         # self.start_poly = Polynomial((-1, 2,3,4))
         # self.x_start_poly=[-4, 4]
@@ -385,7 +372,6 @@ class RandomCubics(Scene):
             self.number_plane.get_axes().set_color("#000000")
 
     def construct(self):
-
         # self.camera.background_color = OneDarkClassicPalette.DARK_GRAY
         self.camera.background_color = (
             GoldenSunsetPalette.LIGHT_BACKGROUND
