@@ -170,27 +170,28 @@ class DotProduct(Scene):
 
         # Add dot product formula
         dot_product_text = MathTex(
-            "Similarity(a,b) = \\vec{a} \\cdot \\vec{b} = ",
+            "Similarity(a,b) = \\vec{a} \\cdot \\vec{b}",
             font_size=self.FONT_SIZE,
             color=Palette.WHITE,
         ).to_edge(UP)
 
         # Add similarity value display next to the formula
         similarity_value = DecimalNumber(
-            0.0,  # initial value
+            np.dot(moving_vec, base_vec),  # initial value
             num_decimal_places=2,
-            font_size=self.FONT_SIZE,
+            font_size=26,
             color=Palette.YELLOW,
         )
-        similarity_value.next_to(dot_product_text, RIGHT)
+        similarity_value.next_to(self.state.projection_line.get_center(), UP)
         dot_product_group = (
             VGroup(
                 dot_product_text,
-                similarity_value,
+                # similarity_value,
             )
             .arrange(RIGHT)
             .to_edge(UP)
         )
+        similarity_value.set_z_index(3)
 
         # Updater for similarity value
         def update_similarity_value(mob):
@@ -198,7 +199,7 @@ class DotProduct(Scene):
             base_vec = self.state.base_vector
             dot = np.dot(moving_vec, base_vec)
             mob.set_value(dot)
-            mob.next_to(dot_product_text, RIGHT)
+            mob.next_to(self.state.projection_line.get_center(), UP)
 
         similarity_value.add_updater(update_similarity_value)
         # Add all objects to scene
@@ -211,6 +212,7 @@ class DotProduct(Scene):
             self.state.vertical_line,
             self.state.projection_dot,
             dot_product_group,
+            similarity_value,
         )
         self.wait()
 
