@@ -15,6 +15,15 @@ def unit_vector(vector):
     return vector / np.linalg.norm(vector)
 
 
+def normalize(vector):
+    """Returns the normalized vector."""
+    return vector / (np.linalg.norm(vector) + 1e-6)
+
+
+def at_arrow_point_position(vector, multiplier=0.35):
+    return vector + normalize(vector) * multiplier
+
+
 def angle_between(v1, v2):
     """Returns the angle in radians between vectors 'v1' and 'v2'"""
     v1_u = unit_vector(v1)
@@ -105,8 +114,9 @@ class VectorProjectionState:
             self.base_arrow.get_end(), DOWN
         )
 
-        updated_moving_label = MathTex("\\vec{b}", color=Palette.RED).next_to(
-            updated_moving_arrow.get_end(), UP
+        # Determine label position based on angle
+        updated_moving_label = MathTex("\\vec{b}", color=Palette.RED).move_to(
+            at_arrow_point_position(updated_moving_arrow.get_end())
         )
 
         return (
@@ -154,7 +164,9 @@ class DotProduct(Scene):
 
         # Position labels
         self.state.base_label.next_to(self.state.base_arrow.get_end(), DOWN)
-        self.state.moving_label.next_to(self.state.moving_arrow.get_end(), UP)
+        self.state.moving_label.move_to(
+            at_arrow_point_position(self.state.moving_arrow.get_end())
+        )
 
         # Add dot product formula
         dot_product_text = MathTex(
@@ -244,9 +256,10 @@ class DotProduct(Scene):
         )
         self.play(
             self.state.angle_tracker.animate.set_value(np.pi / 4),
-            self.state.magnitude_tracker.animate.set_value(2),
+            self.state.magnitude_tracker.animate.set_value(np.linalg.norm(moving_vec)),
             run_time=3,
         )
+        self.wait()
 
     def calculate_projection(
         self, vector_a: np.ndarray, vector_b: np.ndarray
