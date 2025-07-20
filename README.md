@@ -19,7 +19,7 @@ python render.py render-multiple -w 720 -h 720 --format webm -v blog/linestar/li
 -p "MUTED_RAINBOW" "EGGSHELL_WHITE" \
 -p "NEON_RAINBOW" "EGGSHELL_WHITE" \
 -p "ONEDARK_CLASS_RAINBOW" "EGGSHELL_WHITE" \
--p "ONEDARK_VIVID_RAINBOW" "EGGSHELL_WHITE" 
+-p "ONEDARK_VIVID_RAINBOW" "EGGSHELL_WHITE"
 ```
 
 ### Dark background
@@ -34,5 +34,5 @@ python render.py render-multiple -w 720 -h 720 --format gif -v blog/linestar/dar
 -p "MUTED_RAINBOW" "#282c33" \
 -p "NEON_RAINBOW" "#282c33" \
 -p "ONEDARK_CLASS_RAINBOW" "#282c33" \
--p "ONEDARK_VIVID_RAINBOW" "#282c33" 
+-p "ONEDARK_VIVID_RAINBOW" "#282c33"
 ```
