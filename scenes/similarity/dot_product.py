@@ -1,11 +1,14 @@
+from PIL.Image import Palette
 from manim import *
-from manim import Vector
+from manim import Vector, DecimalNumber
 from manim.typing import Vector2D, Vector3D
 import numpy as np
 import math
 from typing import List, Tuple
-from manimations.colors import OneDarkClassicPalette
+from manimations.colors import OneDarkClassicPalette, OneDarkVividPalette
 from dataclasses import dataclass
+
+Palette = OneDarkVividPalette
 
 
 def unit_vector(vector):
@@ -85,31 +88,27 @@ class VectorProjectionState:
         )
 
         # Create updated objects (don't modify originals, create new ones)
-        updated_moving_arrow = Vector(
-            current_moving_vector, color=OneDarkClassicPalette.RED
-        )
+        updated_moving_arrow = Vector(current_moving_vector, color=Palette.RED)
 
         updated_projection_line = Line(
-            start=ORIGIN, end=projection_point, color=OneDarkClassicPalette.YELLOW
+            start=ORIGIN, end=projection_point, color=Palette.YELLOW
         )
 
         updated_vertical_line = DashedLine(
             start=current_moving_vector,
             end=projection_point,
-            color=OneDarkClassicPalette.BLUE,
+            color=Palette.BLUE,
         )
 
-        updated_projection_dot = Dot(
-            projection_point, color=OneDarkClassicPalette.LIGHT_BLUE
+        updated_projection_dot = Dot(projection_point, color=Palette.LIGHT_BLUE)
+
+        updated_base_label = MathTex("\\vec{a}", color=Palette.GREEN).next_to(
+            self.base_arrow.get_end(), DOWN
         )
 
-        updated_base_label = MathTex(
-            "\\vec{a}", color=OneDarkClassicPalette.GREEN
-        ).next_to(self.base_arrow.get_end(), DOWN)
-
-        updated_moving_label = MathTex(
-            "\\vec{b}", color=OneDarkClassicPalette.RED
-        ).next_to(updated_moving_arrow.get_end(), UP)
+        updated_moving_label = MathTex("\\vec{b}", color=Palette.RED).next_to(
+            updated_moving_arrow.get_end(), UP
+        )
 
         return (
             updated_moving_arrow,
@@ -121,8 +120,11 @@ class VectorProjectionState:
         )
 
 
-class VectorScene(Scene):
+class DotProduct(Scene):
+    FONT_SIZE = 36
+
     def construct(self):
+        self.camera.background_color = Palette.DARK_BACKGROUND
         # Initial vector values
         base_vec = RIGHT
         moving_vec = np.array([2, 2, 0])
@@ -134,21 +136,19 @@ class VectorScene(Scene):
         self.state = VectorProjectionState(
             base_vector=base_vec,
             initial_moving_vector=moving_vec,
-            base_arrow=Vector(base_vec, color=OneDarkClassicPalette.GREEN),
-            moving_arrow=Vector(moving_vec, color=OneDarkClassicPalette.RED),
+            base_arrow=Vector(base_vec, color=Palette.GREEN),
+            moving_arrow=Vector(moving_vec, color=Palette.RED),
             projection_line=Line(
-                start=ORIGIN, end=initial_projection, color=OneDarkClassicPalette.YELLOW
+                start=ORIGIN, end=initial_projection, color=Palette.YELLOW
             ),
             vertical_line=DashedLine(
                 start=moving_vec,
                 end=initial_projection,
-                color=OneDarkClassicPalette.BLUE,
+                color=Palette.BLUE,
             ),
-            projection_dot=Dot(
-                initial_projection, color=OneDarkClassicPalette.LIGHT_BLUE
-            ),
-            base_label=MathTex("\\vec{a}", color=OneDarkClassicPalette.GREEN),
-            moving_label=MathTex("\\vec{b}", color=OneDarkClassicPalette.RED),
+            projection_dot=Dot(initial_projection, color=Palette.LIGHT_BLUE),
+            base_label=MathTex("\\vec{a}", color=Palette.GREEN),
+            moving_label=MathTex("\\vec{b}", color=Palette.RED),
             angle_tracker=ValueTracker(0),
             magnitude_tracker=ValueTracker(0),
         )
@@ -159,11 +159,37 @@ class VectorScene(Scene):
 
         # Add dot product formula
         dot_product_text = MathTex(
-            "f(a,b) = \\vec{a} \\cdot \\vec{b}",
-            font_size=36,
-            color=OneDarkClassicPalette.WHITE,
-        ).to_edge(UL)
+            "Similarity(a,b) = \\vec{a} \\cdot \\vec{b} = ",
+            font_size=self.FONT_SIZE,
+            color=Palette.WHITE,
+        ).to_edge(UP)
 
+        # Add similarity value display next to the formula
+        similarity_value = DecimalNumber(
+            0.0,  # initial value
+            num_decimal_places=2,
+            font_size=self.FONT_SIZE,
+            color=Palette.YELLOW,
+        )
+        similarity_value.next_to(dot_product_text, RIGHT)
+        dot_product_group = (
+            VGroup(
+                dot_product_text,
+                similarity_value,
+            )
+            .arrange(RIGHT)
+            .to_edge(UP)
+        )
+
+        # Updater for similarity value
+        def update_similarity_value(mob):
+            moving_vec = self.state.get_current_moving_vector()
+            base_vec = self.state.base_vector
+            dot = np.dot(moving_vec, base_vec)
+            mob.set_value(dot)
+            mob.next_to(dot_product_text, RIGHT)
+
+        similarity_value.add_updater(update_similarity_value)
         # Add all objects to scene
         self.add(
             self.state.base_arrow,
@@ -173,7 +199,7 @@ class VectorScene(Scene):
             self.state.projection_line,
             self.state.vertical_line,
             self.state.projection_dot,
-            dot_product_text,
+            dot_product_group,
         )
         self.wait()
 
@@ -199,21 +225,29 @@ class VectorScene(Scene):
 
         # Animate
         self.play(
-            self.state.angle_tracker.animate.set_value(np.pi),
-            self.state.magnitude_tracker.animate.set_value(1.5),
-            run_time=3,
+            self.state.angle_tracker.animate.set_value(np.pi + np.pi / 4),
+            self.state.magnitude_tracker.animate.set_value(1),
+            run_time=4,
         )
 
         self.wait()
 
         # Additional animation
         self.play(
-            self.state.angle_tracker.animate.set_value(2 * np.pi),
-            self.state.magnitude_tracker.animate.set_value(3),
-            run_time=4,
+            # self.state.angle_tracker.animate.set_value(2 * np.pi),
+            self.state.magnitude_tracker.animate.set_value(4),
+            run_time=2,
         )
-
-        self.wait()
+        self.play(
+            # self.state.angle_tracker.animate.set_value(2 * np.pi),
+            self.state.magnitude_tracker.animate.set_value(0.5),
+            run_time=2,
+        )
+        self.play(
+            self.state.angle_tracker.animate.set_value(np.pi / 4),
+            self.state.magnitude_tracker.animate.set_value(2),
+            run_time=3,
+        )
 
     def calculate_projection(
         self, vector_a: np.ndarray, vector_b: np.ndarray
