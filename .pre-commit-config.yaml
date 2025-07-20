@@ -3,6 +3,14 @@ repos:
     rev: v0.4.4
     hooks:
       - id: ruff
+        name: ruff-lint
+        args: ["--no-fix"]
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+      - id: ruff-format
+        name: ruff-format
+        args: ["--select=I"]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
