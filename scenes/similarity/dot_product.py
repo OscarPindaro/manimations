@@ -1,274 +1,264 @@
 from manim import *
-from manim import Vector, DecimalNumber
-from manim.typing import Vector2D, Vector3D
 import numpy as np
-import math
-from typing import List, Tuple
 from manimations.colors import OneDarkClassicPalette, OneDarkVividPalette
-from dataclasses import dataclass
 
 Palette = OneDarkVividPalette
 
 
-def unit_vector(vector):
-    """Returns the unit vector of the vector."""
-    return vector / np.linalg.norm(vector)
-
-
-def normalize(vector):
-    """Returns the normalized vector."""
-    return vector / (np.linalg.norm(vector) + 1e-6)
-
-
-def at_arrow_point_position(vector, multiplier=0.35):
-    return vector + normalize(vector) * multiplier
-
-
-def angle_between(v1, v2):
-    """Returns the angle in radians between vectors 'v1' and 'v2'"""
-    v1_u = unit_vector(v1)
-    v2_u = unit_vector(v2)
-    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
-
-
-@dataclass
-class VectorProjectionState:
-    """Holds all the state for the vector projection animation"""
-
-    # Base vectors
-    base_vector: np.ndarray
-    initial_moving_vector: np.ndarray
-
-    # Manim objects
-    base_arrow: Vector
-    moving_arrow: Vector
-    projection_line: Line
-    vertical_line: DashedLine
-    projection_dot: Dot
-    base_label: MathTex
-    moving_label: MathTex
-
-    # Trackers
-    angle_tracker: ValueTracker
-    magnitude_tracker: ValueTracker
-
-    def __post_init__(self):
-        # Calculate initial values
-        initial_angle = angle_between(self.initial_moving_vector, RIGHT)
-        initial_magnitude = np.linalg.norm(self.initial_moving_vector)
-
-        # Set tracker initial values
-        self.angle_tracker.set_value(initial_angle)
-        self.magnitude_tracker.set_value(initial_magnitude)
-        # z indexing
-        self.base_arrow.set_z_index(0)
-        self.moving_arrow.set_z_index(0)
-        self.projection_line.set_z_index(-1)
-        self.vertical_line.set_z_index(1)
-        self.projection_dot.set_z_index(2)
-
-    def calculate_projection(
-        self, vector_a: np.ndarray, vector_b: np.ndarray
-    ) -> np.ndarray:
-        """Calculate the projection of vector_a onto vector_b"""
-        dot_product = np.dot(vector_a, vector_b)
-        magnitude_b_squared = np.dot(vector_b, vector_b)
-        projection_scalar = dot_product / magnitude_b_squared
-        projection_point = projection_scalar * vector_b
-        return projection_point
-
-    def get_current_moving_vector(self) -> np.ndarray:
-        """Get the current position of the moving vector based on trackers"""
-        angle = self.angle_tracker.get_value()
-        magnitude = self.magnitude_tracker.get_value()
-        return np.array([magnitude * np.cos(angle), magnitude * np.sin(angle), 0])
-
-    def update_all_objects(
+class DotProductGroup(VGroup):
+    def __init__(
         self,
-    ) -> Tuple[Vector, Line, DashedLine, Dot, MathTex, MathTex]:
-        """Update all objects based on current tracker values. Returns updated objects."""
-        # Get current moving vector position
-        current_moving_vector = self.get_current_moving_vector()
+        angle=PI / 4,
+        vec_a_magnitude=2,
+        vec_b_magnitude=2,
+        show_arc=True,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+
+        # State vectors (vec_a is green/fixed, vec_b is red/rotatable)
+        self.vec_a = np.array([1, 0, 0])  # Fixed horizontal vector
+        self.vec_b = np.array([np.cos(angle), np.sin(angle), 0])  # Rotatable vector
+        self.vec_a_magnitude = vec_a_magnitude
+        self.vec_b_magnitude = vec_b_magnitude
+        self.angle = angle
+        self.show_arc = show_arc
+
+        # Origin dot (white center point)
+        self.dot = Dot(ORIGIN, color=Palette.WHITE)
+
+        # Vectors
+        self.vec_a_arrow = Vector(
+            self.vec_a * self.vec_a_magnitude, color=Palette.GREEN
+        )
+        self.vec_b_arrow = Vector(self.vec_b * self.vec_b_magnitude, color=Palette.RED)
 
         # Calculate projection
-        projection_point = self.calculate_projection(
-            current_moving_vector, self.base_vector
+        dot_product = np.dot(self.vec_b, self.vec_a)
+        self.projection_point_pos = dot_product * self.vec_a * self.vec_a_magnitude
+
+        # Projection visualization
+        self.projection_point = Dot(self.projection_point_pos, color=Palette.LIGHT_BLUE)
+        self.projection_line = Line(
+            ORIGIN,
+            self.projection_point_pos,
+            stroke_width=6,
+            color=Palette.YELLOW,
+            z_index=1,
+        )
+        self.vert_line = DashedLine(
+            self.vec_b_arrow.get_end(), self.projection_point_pos, color=Palette.BLUE
         )
 
-        # Create updated objects (don't modify originals, create new ones)
-        updated_moving_arrow = Vector(current_moving_vector, color=Palette.RED)
+        # Angle arc (optional)
+        self.angle_arc = None
+        if self.show_arc:
+            arc_radius = min(self.vec_a_magnitude, self.vec_b_magnitude) * 0.3
+            # Ensure arc radius is reasonable
+            arc_radius = max(0.2, min(arc_radius, 1.0))
+            self.angle_arc = ArcBetweenPoints(
+                start=self.dot.get_center() + self.vec_a * arc_radius,
+                end=self.dot.get_center() + self.vec_b * arc_radius,
+                radius=arc_radius,
+                color=Palette.WHITE,
+                stroke_width=8,
+            )
+            # self.angle_arc.move_arc_center_to(self.dot.get_center())
 
-        updated_projection_line = Line(
-            start=ORIGIN, end=projection_point, color=Palette.YELLOW
+        # Labels
+        self.vec_a_label = MathTex("\\vec{a}", color=Palette.GREEN).next_to(
+            self.vec_a_arrow.get_end(), DOWN
+        )
+        self.vec_b_label = MathTex("\\vec{b}", color=Palette.RED).next_to(
+            self.vec_b_arrow.get_end(), UP
         )
 
-        updated_vertical_line = DashedLine(
-            start=current_moving_vector,
-            end=projection_point,
-            color=Palette.BLUE,
+        # Add all elements to the group
+        elements_to_add = [
+            self.vec_a_arrow,
+            self.vec_b_arrow,
+            self.projection_line,
+            self.vert_line,
+            self.dot,
+            self.projection_point,
+            self.vec_a_label,
+            self.vec_b_label,
+        ]
+
+        if self.angle_arc is not None:
+            elements_to_add.insert(0, self.angle_arc)
+
+        self.add(*elements_to_add)
+
+        self.update_group()
+
+    def update_angle(self, angle):
+        """Update the angle between vectors (vec_a remains fixed)"""
+        self.angle = angle
+        self.vec_b = np.array([np.cos(angle), np.sin(angle), 0])
+        self.update_group()
+
+    def update_vec_b_magnitude(self, magnitude):
+        """Update the magnitude of vec_b (red vector)"""
+        self.vec_b_magnitude = magnitude
+        self.update_group()
+
+    def update_vec_a_magnitude(self, magnitude):
+        """Update the magnitude of vec_a (green vector)"""
+        self.vec_a_magnitude = magnitude
+        self.update_group()
+
+    def update_group(self):
+        """Update all visualization elements based on current state"""
+        center = self.dot.get_center()
+
+        # Update vector endpoints
+        vec_a_end = center + self.vec_a * self.vec_a_magnitude
+        vec_b_end = center + self.vec_b * self.vec_b_magnitude
+
+        # Update arrows
+        self.vec_a_arrow.put_start_and_end_on(center, vec_a_end)
+        self.vec_b_arrow.put_start_and_end_on(center, vec_b_end)
+
+        # Calculate projection
+        dot_product = np.dot(
+            self.vec_b * self.vec_b_magnitude, self.vec_a * self.vec_a_magnitude
+        )
+        # given that a*b = |a||b|cos(theta)
+        # i want only the orizontal component of |b|, therefore
+        # |b|cos(theta)
+        self.projection_point_pos = (
+            center + dot_product * self.vec_a / self.vec_a_magnitude
+        )
+        # self.projection_point_pos = center + dot_product * self.vec_a
+
+        # Update projection visualization
+        self.projection_line.put_start_and_end_on(center, self.projection_point_pos)
+        self.vert_line.put_start_and_end_on(vec_b_end, self.projection_point_pos)
+        self.projection_point.move_to(self.projection_point_pos)
+
+        # Update angle arc
+        if self.angle_arc is not None:
+            arc_radius = min(self.vec_a_magnitude, self.vec_b_magnitude) * 0.3
+            # Ensure arc radius is reasonable
+            arc_radius = max(0.2, min(arc_radius, 1.0))
+
+            # Create new arc with updated angle
+            if (self.vec_b - self.vec_a)[1] > 0:
+                new_arc = ArcBetweenPoints(
+                    start=center + self.vec_a * arc_radius,
+                    end=center + self.vec_b * arc_radius,
+                    color=Palette.WHITE,
+                    stroke_width=8,
+                )
+            else:
+                new_arc = ArcBetweenPoints(
+                    start=center + self.vec_b * arc_radius,
+                    end=center + self.vec_a * arc_radius,
+                    color=Palette.WHITE,
+                    stroke_width=8,
+                )
+            self.angle_arc.become(new_arc)
+
+        # Update labels
+        self.vec_a_label.next_to(vec_a_end, DOWN)
+        self.vec_b_label.next_to(vec_b_end, UP)
+
+    def get_dot_product(self):
+        """Calculate the dot product of the current vectors"""
+        return np.dot(
+            self.vec_b * self.vec_b_magnitude, self.vec_a * self.vec_a_magnitude
         )
 
-        updated_projection_dot = Dot(projection_point, color=Palette.LIGHT_BLUE)
 
-        updated_base_label = MathTex("\\vec{a}", color=Palette.GREEN).next_to(
-            self.base_arrow.get_end(), DOWN
-        )
-
-        # Determine label position based on angle
-        updated_moving_label = MathTex("\\vec{b}", color=Palette.RED).move_to(
-            at_arrow_point_position(updated_moving_arrow.get_end())
-        )
-
-        return (
-            updated_moving_arrow,
-            updated_projection_line,
-            updated_vertical_line,
-            updated_projection_dot,
-            updated_base_label,
-            updated_moving_label,
-        )
-
-
-class DotProduct(Scene):
-    FONT_SIZE = 36
+class DotProductScene(Scene):
+    STARTING_ANGLE = PI / 3
+    VEC_A_MAGNITUDE = 1
+    VEC_B_MAGNITUDE = 2.5
 
     def construct(self):
         self.camera.background_color = Palette.DARK_BACKGROUND
-        # Initial vector values
-        base_vec = RIGHT
-        moving_vec = np.array([2, 2, 0])
 
-        # Calculate initial projection
-        initial_projection = self.calculate_projection(moving_vec, base_vec)
-
-        # Create state object
-        self.state = VectorProjectionState(
-            base_vector=base_vec,
-            initial_moving_vector=moving_vec,
-            base_arrow=Vector(base_vec, color=Palette.GREEN),
-            moving_arrow=Vector(moving_vec, color=Palette.RED),
-            projection_line=Line(
-                start=ORIGIN, end=initial_projection, color=Palette.YELLOW
-            ),
-            vertical_line=DashedLine(
-                start=moving_vec,
-                end=initial_projection,
-                color=Palette.BLUE,
-            ),
-            projection_dot=Dot(initial_projection, color=Palette.LIGHT_BLUE),
-            base_label=MathTex("\\vec{a}", color=Palette.GREEN),
-            moving_label=MathTex("\\vec{b}", color=Palette.RED),
-            angle_tracker=ValueTracker(0),
-            magnitude_tracker=ValueTracker(0),
+        # Create dot product group
+        dot_product = DotProductGroup(
+            angle=self.STARTING_ANGLE,
+            vec_a_magnitude=self.VEC_A_MAGNITUDE,
+            vec_b_magnitude=self.VEC_B_MAGNITUDE,
         )
+        dot_product.shift(2.5 * LEFT)
+        self.add(dot_product)
 
-        # Position labels
-        self.state.base_label.next_to(self.state.base_arrow.get_end(), DOWN)
-        self.state.moving_label.move_to(
-            at_arrow_point_position(self.state.moving_arrow.get_end())
-        )
+        # Trackers for animation
+        angle_tracker = ValueTracker(self.STARTING_ANGLE)
+        vec_a_magnitude_tracker = ValueTracker(self.VEC_A_MAGNITUDE)
+        vec_b_magnitude_tracker = ValueTracker(self.VEC_B_MAGNITUDE)
 
-        # Add dot product formula
-        dot_product_text = MathTex(
-            "Similarity(a,b) = \\vec{a} \\cdot \\vec{b}",
-            font_size=self.FONT_SIZE,
+        # Dot product formula
+        formula = MathTex(
+            "f(\\vec{a}, \\vec{b}) = \\vec{a} \\cdot \\vec{b} = ",
+            font_size=36,
             color=Palette.WHITE,
-        ).to_edge(UP)
+        ).to_edge(RIGHT)
 
-        # Add similarity value display next to the formula
-        similarity_value = DecimalNumber(
-            np.dot(moving_vec, base_vec),  # initial value
+        # Value display
+        dot_product_value = DecimalNumber(
+            dot_product.get_dot_product(),
             num_decimal_places=2,
-            font_size=26,
+            font_size=36,
             color=Palette.YELLOW,
         )
-        similarity_value.next_to(self.state.projection_line.get_center(), UP)
-        dot_product_group = (
-            VGroup(
-                dot_product_text,
-                # similarity_value,
-            )
+        dot_product_value.next_to(formula, RIGHT)
+
+        text_group = (
+            VGroup(formula, dot_product_value)
             .arrange(RIGHT)
-            .to_edge(UP)
+            .to_edge(RIGHT)
+            .shift(0.5 * LEFT)
         )
-        similarity_value.set_z_index(3)
+        self.add(text_group)
 
-        # Updater for similarity value
-        def update_similarity_value(mob):
-            moving_vec = self.state.get_current_moving_vector()
-            base_vec = self.state.base_vector
-            dot = np.dot(moving_vec, base_vec)
-            mob.set_value(dot)
-            mob.next_to(self.state.projection_line.get_center(), UP)
+        dot_product.shift(DOWN * 0.5)
+        text_group.shift(DOWN * 0.5)
+        # Title
+        title = Text("Dot Product", font_size=48, color=Palette.WHITE).to_edge(UP)
+        self.add(title)
 
-        similarity_value.add_updater(update_similarity_value)
-        # Add all objects to scene
-        self.add(
-            self.state.base_arrow,
-            self.state.moving_arrow,
-            self.state.base_label,
-            self.state.moving_label,
-            self.state.projection_line,
-            self.state.vertical_line,
-            self.state.projection_dot,
-            dot_product_group,
-            similarity_value,
-        )
-        self.wait()
+        # Updater for dot product value
+        def update_dot_product_value(mob):
+            mob.set_value(dot_product.get_dot_product())
+            mob.next_to(formula, RIGHT)
 
-        # Add updaters
-        self.state.moving_arrow.add_updater(
-            lambda obj: obj.become(self.state.update_all_objects()[0])
+        dot_product_value.add_updater(update_dot_product_value)
+
+        # Animation logic with updaters
+        dot_product.add_updater(lambda mob: mob.update_angle(angle_tracker.get_value()))
+        dot_product.add_updater(
+            lambda mob: mob.update_vec_a_magnitude(vec_a_magnitude_tracker.get_value())
         )
-        self.state.projection_line.add_updater(
-            lambda obj: obj.become(self.state.update_all_objects()[1])
-        )
-        self.state.vertical_line.add_updater(
-            lambda obj: obj.become(self.state.update_all_objects()[2])
-        )
-        self.state.projection_dot.add_updater(
-            lambda obj: obj.become(self.state.update_all_objects()[3])
-        )
-        self.state.base_label.add_updater(
-            lambda obj: obj.become(self.state.update_all_objects()[4])
-        )
-        self.state.moving_label.add_updater(
-            lambda obj: obj.become(self.state.update_all_objects()[5])
+        dot_product.add_updater(
+            lambda mob: mob.update_vec_b_magnitude(vec_b_magnitude_tracker.get_value())
         )
 
-        # Animate
+        # Animations
         self.play(
-            self.state.angle_tracker.animate.set_value(np.pi + np.pi / 4),
-            self.state.magnitude_tracker.animate.set_value(1),
-            run_time=4,
+            vec_a_magnitude_tracker.animate.set_value(1.5),
+            vec_b_magnitude_tracker.animate.set_value(1.5),
+            run_time=3,
         )
 
-        self.wait()
+        self.play(angle_tracker.animate.set_value(5 * PI / 6), run_time=3)
 
-        # Additional animation
+        self.play((vec_a_magnitude_tracker.animate.set_value(2.5)))
         self.play(
-            # self.state.angle_tracker.animate.set_value(2 * np.pi),
-            self.state.magnitude_tracker.animate.set_value(4),
-            run_time=2,
+            angle_tracker.animate.set_value(-PI / 6),
+            vec_b_magnitude_tracker.animate.set_value(4),
+            run_time=3,
         )
+        self.wait(0.5)
         self.play(
-            # self.state.angle_tracker.animate.set_value(2 * np.pi),
-            self.state.magnitude_tracker.animate.set_value(0.5),
-            run_time=2,
-        )
-        self.play(
-            self.state.angle_tracker.animate.set_value(np.pi / 4),
-            self.state.magnitude_tracker.animate.set_value(np.linalg.norm(moving_vec)),
+            angle_tracker.animate.set_value(self.STARTING_ANGLE),
+            vec_a_magnitude_tracker.animate.set_value(self.VEC_A_MAGNITUDE),
+            vec_b_magnitude_tracker.animate.set_value(self.VEC_B_MAGNITUDE),
             run_time=3,
         )
         self.wait()
-
-    def calculate_projection(
-        self, vector_a: np.ndarray, vector_b: np.ndarray
-    ) -> np.ndarray:
-        """Calculate the projection of vector_a onto vector_b"""
-        dot_product = np.dot(vector_a, vector_b)
-        magnitude_b_squared = np.dot(vector_b, vector_b)
-        projection_scalar = dot_product / magnitude_b_squared
-        projection_point = projection_scalar * vector_b
-        return projection_point
